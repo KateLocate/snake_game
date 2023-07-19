@@ -22,8 +22,8 @@ class SnakeGame:
         self.field_size = field_size
         self.field = []
 
-        self.snake_body = []
-        self.snake_direction = []
+        self.snake_body = self.get_initial_snake_body()
+        self.snake_direction = SnakeDirection.Right
 
         self.fruit = None
 
@@ -53,27 +53,37 @@ class SnakeGame:
             self.generate_square_field()
         self.field[self.fruit['coordinate_y']][self.fruit['coordinate_x']] = self.FRUIT_CELL
 
-    def generate_initial_snake_state(self):
-        self.snake_body = [{
-            'coordinate_x': int(self.field_size // 2),
-            'coordinate_y': int(self.field_size // 2)
-        }, {
-            'coordinate_x': int(self.field_size // 2) - 1,
-            'coordinate_y': int(self.field_size // 2)
-        }, {
-            'coordinate_x': int(self.field_size // 2) - 2,
-            'coordinate_y': int(self.field_size // 2)
-        }]
-        self.snake_direction = SnakeDirection.Right
+    def get_initial_snake_body(self):
+        middle_field_idx = int(self.field_size // 2)
+        return [{'coordinate_x': middle_field_idx - i, 'coordinate_y': middle_field_idx} for i in range(3)]
 
     def add_snake_to_the_field(self):
-        if not self.snake_body or not self.snake_direction:
-            self.generate_initial_snake_state()
         for part in self.snake_body:
             self.field[part['coordinate_y']][part['coordinate_x']] = self.SNAKE_BODY_PART
 
     def operate_snake_body(self):
-        ...
+
+        def on_arrow_release(key):
+            if key == Key.up:
+                self.snake_direction = SnakeDirection.Up
+            elif key == Key.down:
+                self.snake_direction = SnakeDirection.Down
+            elif key == Key.left:
+                self.snake_direction = SnakeDirection.Left
+            elif key == Key.right:
+                self.snake_direction = SnakeDirection.Right
+            return False
+
+        import time
+        from pynput.keyboard import Key, Listener
+        while True:
+            time.sleep(1)
+            print(self.snake_direction)
+            while time.sleep(1):
+                with Listener(on_release=on_arrow_release) as listener:
+                    listener.join()
+
+
 
 
 if __name__ == '__main__':
@@ -81,4 +91,4 @@ if __name__ == '__main__':
     snake.add_fruit_to_the_field()
     snake.add_snake_to_the_field()
     snake.draw_game_field()
-
+    snake.operate_snake_body()
