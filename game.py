@@ -102,18 +102,13 @@ class SnakeGame:
                     self.snake_direction = event.key
 
     def check_borders(self):
-        if self.snake_body[0][self.X_KEY] == 0 and self.snake_body[0][self.Y_KEY] == 0 \
-                and self.snake_direction in [SnakeDirection.UP, SnakeDirection.LEFT]:
+        if self.snake_body[0][self.X_KEY] == 0 and self.snake_direction == SnakeDirection.LEFT:
             return False
-        elif self.snake_body[0][self.X_KEY] == self.field_size and self.snake_body[0][self.Y_KEY] == 0 \
-                and self.snake_direction in [SnakeDirection.UP, SnakeDirection.RIGHT]:
+        elif self.snake_body[0][self.X_KEY] == self.field_size and self.snake_direction == SnakeDirection.RIGHT:
             return False
-        elif self.snake_body[0][self.X_KEY] == self.field_size and self.snake_body[0][
-            self.Y_KEY] == self.field_size \
-                and self.snake_direction in [SnakeDirection.DOWN, SnakeDirection.RIGHT]:
+        elif self.snake_body[0][self.Y_KEY] == self.field_size and self.snake_direction == SnakeDirection.DOWN:
             return False
-        elif self.snake_body[0][self.X_KEY] == 0 and self.snake_body[0][self.Y_KEY] == self.field_size \
-                and self.snake_direction in [SnakeDirection.DOWN, SnakeDirection.LEFT]:
+        elif self.snake_body[0][self.Y_KEY] == 0 and self.snake_direction == SnakeDirection.UP:
             return False
         elif self.snake_body[0] in self.snake_body[1:]:
             return False
