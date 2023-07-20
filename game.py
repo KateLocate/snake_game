@@ -3,8 +3,6 @@
 # - operations for the snake to perform
 # - snake state
 # - visual representation of the field and the snake
-import time
-
 from pynput import keyboard
 
 
@@ -20,6 +18,8 @@ class SnakeGame:
     FRUIT_CELL = ' @ '
     FIELD_CELL = ' . '
     SNAKE_BODY_PART = ' % '
+
+    BORDER_CELL = ' # '
 
     X_KEY = 'coordinate_x'
     Y_KEY = 'coordinate_y'
@@ -40,19 +40,24 @@ class SnakeGame:
     def draw_game_field(self):
         self.add_snake_to_the_field()
 
+        print(self.BORDER_CELL * (self.field_size + 3))
         for row in self.field:
             str_row = ''
             for cell in row:
                 str_row += cell
-            print(str_row)
+            print(self.BORDER_CELL, str_row, self.BORDER_CELL)
+        print(self.BORDER_CELL * (self.field_size + 3))
 
     def generate_fruit_pos(self):
         import random
         sample = [i for i in range(self.field_size)]
+
         self.fruit = {
             'coordinate_x': random.choice(sample),
             'coordinate_y': random.choice(sample)
         }
+        if self.fruit in self.snake_body:
+            self.generate_fruit_pos()
 
     def add_fruit_to_the_field(self):
         if not self.fruit:
@@ -84,7 +89,9 @@ class SnakeGame:
             self.snake_body.insert(0, {self.X_KEY: prev_coord_x + 1, self.Y_KEY: prev_coord_y})
 
         if self.fruit != self.snake_body[0]:
-            self.snake_body.pop(-1)
+            self.field[self.snake_body[-1][self.Y_KEY]][self.snake_body[-1][self.X_KEY]] = self.FIELD_CELL
+            self.snake_body = self.snake_body[:-1]
+            print(self.snake_body)
         else:
             self.fruit = None
             self.add_fruit_to_the_field()
@@ -122,11 +129,9 @@ class SnakeGame:
         self.add_fruit_to_the_field()
 
         while self.check_borders():
-            self.draw_game_field()
-
-            self.record_the_arrow_keys_pressing()
-
             self.move_snake_in_direction()
+            self.draw_game_field()
+            self.record_the_arrow_keys_pressing()
 
 
 if __name__ == '__main__':
