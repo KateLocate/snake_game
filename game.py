@@ -33,6 +33,8 @@ class SnakeGame:
 
         self.fruit = None
 
+        self.score = 0
+
     def generate_square_field(self):
         for i in range(self.field_size):
             self.field.append([self.FIELD_CELL for _ in range(self.field_size)])
@@ -40,6 +42,7 @@ class SnakeGame:
     def draw_game_field(self):
         self.add_snake_to_the_field()
 
+        print(f'Ordinary Snake Game!\nThe score: {self.score}.')
         print(self.BORDER_CELL * (self.field_size + 3))
         for row in self.field:
             str_row = ''
@@ -71,12 +74,6 @@ class SnakeGame:
         return [{self.X_KEY: middle_field_idx - i, self.Y_KEY: middle_field_idx} for i in range(3)]
 
     def move_snake_in_direction(self):
-        # To calculate the movement we need to:
-        #  increase the body if the fruit is in the place where the head is heading :)
-        #  save the angles of body
-        #  recalculate position of the first and the last known segment of body
-        #  the first component is in the direction of movement
-        #  the last component disappears or stays the same depending on the fruit case
         prev_coord_x, prev_coord_y = self.snake_body[0][self.X_KEY], self.snake_body[0][self.Y_KEY]
 
         if self.snake_direction == SnakeDirection.UP:
@@ -93,6 +90,7 @@ class SnakeGame:
             self.snake_body = self.snake_body[:-1]
         else:
             self.fruit = None
+            self.score += 1
             self.add_fruit_to_the_field()
 
     def add_snake_to_the_field(self):
@@ -122,15 +120,14 @@ class SnakeGame:
             return True
 
     def launch_game(self):
-        # We need to record the last instruction from user, otherwise we use previous snake_direction.
-        # We also need to render the field every second (2, 3?).
-        # We need while loop that stops when the snake's head is on any edge of the field and heading towards this edge.
         self.add_fruit_to_the_field()
 
         while self.check_borders():
             self.move_snake_in_direction()
             self.draw_game_field()
             self.record_the_arrow_keys_pressing()
+
+        print(f'Thank you for playing!\nYour score: {self.score}.')
 
 
 if __name__ == '__main__':
