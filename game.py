@@ -19,12 +19,12 @@ class SnakeGame:
     FIELD_CELL = ' . '
     SNAKE_BODY_PART = ' % '
 
-    BORDER_CELL = ' # '
+    BORDER_CELL = ' ~ '
 
     X_KEY = 'coordinate_x'
     Y_KEY = 'coordinate_y'
 
-    def __init__(self, field_size):
+    def __init__(self, field_size=10):
         self.field_size = field_size
         self.field = []
 
@@ -91,7 +91,6 @@ class SnakeGame:
         if self.fruit != self.snake_body[0]:
             self.field[self.snake_body[-1][self.Y_KEY]][self.snake_body[-1][self.X_KEY]] = self.FIELD_CELL
             self.snake_body = self.snake_body[:-1]
-            print(self.snake_body)
         else:
             self.fruit = None
             self.add_fruit_to_the_field()
@@ -111,9 +110,9 @@ class SnakeGame:
     def check_borders(self):
         if self.snake_body[0][self.X_KEY] == 0 and self.snake_direction == SnakeDirection.LEFT:
             return False
-        elif self.snake_body[0][self.X_KEY] == self.field_size and self.snake_direction == SnakeDirection.RIGHT:
+        elif self.snake_body[0][self.X_KEY] == self.field_size - 1 and self.snake_direction == SnakeDirection.RIGHT:
             return False
-        elif self.snake_body[0][self.Y_KEY] == self.field_size and self.snake_direction == SnakeDirection.DOWN:
+        elif self.snake_body[0][self.Y_KEY] == self.field_size - 1 and self.snake_direction == SnakeDirection.DOWN:
             return False
         elif self.snake_body[0][self.Y_KEY] == 0 and self.snake_direction == SnakeDirection.UP:
             return False
@@ -135,5 +134,4 @@ class SnakeGame:
 
 
 if __name__ == '__main__':
-    snake = SnakeGame(10)
-    snake.launch_game()
+    SnakeGame().launch_game()
