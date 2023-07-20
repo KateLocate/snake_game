@@ -11,7 +11,7 @@ class SnakeDirection:
     DOWN = keyboard.Key.down
     LEFT = keyboard.Key.left
     RIGHT = keyboard.Key.right
-    MOVEMENTS = [UP, DOWN, LEFT, RIGHT]
+    ALL_DIRECTIONS = [UP, DOWN, LEFT, RIGHT]
 
 
 class SnakeGame:
@@ -58,9 +58,29 @@ class SnakeGame:
         middle_field_idx = int(self.field_size // 2)
         return [{'coordinate_x': middle_field_idx - i, 'coordinate_y': middle_field_idx} for i in range(3)]
 
+    def move_snake_in_direction(self):
+        # To calculate the movement we need to:
+        #  increase the body if the fruit is in the place where the head is heading :)
+        #  save the angles of body
+        #  recalculate position of the first and the last known segment of body
+        #  the first component is in the direction of movement
+        #  the last component is moving in the direction of the previous segment
+
+        if self.snake_direction == SnakeDirection.UP:
+
+
+
     def add_snake_to_the_field(self):
         for part in self.snake_body:
             self.field[part['coordinate_y']][part['coordinate_x']] = self.SNAKE_BODY_PART
+
+    def record_the_arrow_keys_pressing(self):
+        with keyboard.Events() as events:
+            # Block at most one second
+            event = events.get(1.0)
+            if event is not None:
+                if event.key in SnakeDirection.ALL_DIRECTIONS:
+                    self.snake_direction = event.key
 
     def operate_snake_body(self):
         # We need to record the last instruction from user, otherwise we use previous snake_direction.
@@ -84,12 +104,9 @@ class SnakeGame:
 
             self.draw_game_field()
 
-            with keyboard.Events() as events:
-                # Block at most one second
-                event = events.get(1.0)
-                if event is not None:
-                    if event.key in SnakeDirection.MOVEMENTS:
-                        self.snake_direction = event.key
+            self.record_the_arrow_keys_pressing()
+
+            self.move_snake_in_direction()
 
 
 if __name__ == '__main__':
