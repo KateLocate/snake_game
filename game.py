@@ -3,14 +3,15 @@
 # - operations for the snake to perform
 # - snake state
 # - visual representation of the field and the snake
-from enum import Enum, auto
+from pynput import keyboard
 
 
-class SnakeDirection(Enum):
-    Up = auto()
-    Down = auto()
-    Left = auto()
-    Right = auto()
+class SnakeDirection:
+    UP = keyboard.Key.up
+    DOWN = keyboard.Key.down
+    LEFT = keyboard.Key.left
+    RIGHT = keyboard.Key.right
+    MOVEMENTS = [UP, DOWN, LEFT, RIGHT]
 
 
 class SnakeGame:
@@ -23,7 +24,7 @@ class SnakeGame:
         self.field = []
 
         self.snake_body = self.get_initial_snake_body()
-        self.snake_direction = SnakeDirection.Right
+        self.snake_direction = SnakeDirection.RIGHT
 
         self.fruit = None
 
@@ -62,28 +63,33 @@ class SnakeGame:
             self.field[part['coordinate_y']][part['coordinate_x']] = self.SNAKE_BODY_PART
 
     def operate_snake_body(self):
+        # We need to record the last instruction from user, otherwise we use previous snake_direction.
+        # We also need to render the field every second (2, 3?).
+        # We need while loop that stops when the snake's head is on any edge of the field and heading towards this edge.
 
-        def on_arrow_release(key):
-            if key == Key.up:
-                self.snake_direction = SnakeDirection.Up
-            elif key == Key.down:
-                self.snake_direction = SnakeDirection.Down
-            elif key == Key.left:
-                self.snake_direction = SnakeDirection.Left
-            elif key == Key.right:
-                self.snake_direction = SnakeDirection.Right
-            return False
-
-        import time
-        from pynput.keyboard import Key, Listener
         while True:
-            time.sleep(1)
-            print(self.snake_direction)
-            while time.sleep(1):
-                with Listener(on_release=on_arrow_release) as listener:
-                    listener.join()
+            if self.snake_body[0]['coordinate_x'] == 0 and self.snake_body[0]['coordinate_y'] == 0 \
+                    and self.snake_direction in [SnakeDirection.UP, SnakeDirection.LEFT]:
+                break
+            elif self.snake_body[0]['coordinate_x'] == self.field_size and self.snake_body[0]['coordinate_y'] == 0 \
+                    and self.snake_direction in [SnakeDirection.UP, SnakeDirection.RIGHT]:
+                break
+            elif self.snake_body[0]['coordinate_x'] == self.field_size and self.snake_body[0][
+                'coordinate_y'] == self.field_size \
+                    and self.snake_direction in [SnakeDirection.DOWN, SnakeDirection.RIGHT]:
+                break
+            elif self.snake_body[0]['coordinate_x'] == 0 and self.snake_body[0]['coordinate_y'] == self.field_size \
+                    and self.snake_direction in [SnakeDirection.DOWN, SnakeDirection.LEFT]:
+                break
 
+            self.draw_game_field()
 
+            with keyboard.Events() as events:
+                # Block at most one second
+                event = events.get(1.0)
+                if event is not None:
+                    if event.key in SnakeDirection.MOVEMENTS:
+                        self.snake_direction = event.key
 
 
 if __name__ == '__main__':
