@@ -13,8 +13,8 @@ class SnakeDirection:
 
 
 class SnakeGame:
-    GREETING_PHRASE = 'Ordinary Snake Game!\nThe score: {}.'
-    END_PHRASE = 'Thank you for playing!'
+    GREETING_PHRASE = '==Ordinary Snake Game==\nThe score: {}.'
+    END_PHRASE = '\n==Good job! Thank you for playing!=='
 
     FRUIT_CELL = ' @ '
     FIELD_CELL = ' . '
@@ -131,7 +131,8 @@ class SnakeGame:
     def add_pause_to_movements(func):
         def wrapper(self):
             max_pause, min_pause, coefficient = 1.0, 0.4, 25
-            pause = max_pause - (self.score / coefficient) if self.score / coefficient < min_pause else min_pause
+            pause = max_pause - (self.score / coefficient)
+            pause = pause if pause > min_pause else min_pause
 
             start = time.time()
             func(self, pause)
