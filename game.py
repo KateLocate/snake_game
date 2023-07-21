@@ -1,8 +1,3 @@
-# In order for game to exist we need:
-# - controllers for person
-# - operations for the snake to perform
-# - snake state
-# - visual representation of the field and the snake
 import os
 
 from pynput import keyboard
@@ -83,6 +78,20 @@ class SnakeGame:
         middle_field_idx = int(self.field_size // 2)
         return [{self.X_KEY: middle_field_idx - i, self.Y_KEY: middle_field_idx} for i in range(3)]
 
+    def check_borders(self):
+        if self.snake_body[0][self.X_KEY] == 0 and self.snake_direction == SnakeDirection.LEFT:
+            return False
+        elif self.snake_body[0][self.X_KEY] == self.field_size - 1 and self.snake_direction == SnakeDirection.RIGHT:
+            return False
+        elif self.snake_body[0][self.Y_KEY] == self.field_size - 1 and self.snake_direction == SnakeDirection.DOWN:
+            return False
+        elif self.snake_body[0][self.Y_KEY] == 0 and self.snake_direction == SnakeDirection.UP:
+            return False
+        elif self.snake_body[0] in self.snake_body[1:]:
+            return False
+        else:
+            return True
+
     def move_snake_in_direction(self):
         prev_coord_x, prev_coord_y = self.snake_body[0][self.X_KEY], self.snake_body[0][self.Y_KEY]
 
@@ -126,20 +135,6 @@ class SnakeGame:
                 if event.key in SnakeDirection.ALL_DIRECTIONS:
                     self.previous_snake_direction = self.snake_direction
                     self.snake_direction = event.key
-
-    def check_borders(self):
-        if self.snake_body[0][self.X_KEY] == 0 and self.snake_direction == SnakeDirection.LEFT:
-            return False
-        elif self.snake_body[0][self.X_KEY] == self.field_size - 1 and self.snake_direction == SnakeDirection.RIGHT:
-            return False
-        elif self.snake_body[0][self.Y_KEY] == self.field_size - 1 and self.snake_direction == SnakeDirection.DOWN:
-            return False
-        elif self.snake_body[0][self.Y_KEY] == 0 and self.snake_direction == SnakeDirection.UP:
-            return False
-        elif self.snake_body[0] in self.snake_body[1:]:
-            return False
-        else:
-            return True
 
     def launch_game(self):
         self.add_fruit_to_the_field()
