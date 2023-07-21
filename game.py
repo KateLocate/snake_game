@@ -106,12 +106,11 @@ class SnakeGame:
         elif self.snake_direction == SnakeDirection.RIGHT:
             new_head = {self.X_KEY: prev_coord_x + 1, self.Y_KEY: prev_coord_y}
 
-        if new_head:
-            if new_head != self.snake_body[1]:
-                self.snake_body.insert(0, new_head)
-            else:
-                self.snake_direction = self.previous_snake_direction
-                return
+        if new_head != self.snake_body[1]:
+            self.snake_body.insert(0, new_head)
+        else:
+            self.snake_direction = None
+            return
 
         if self.fruit != self.snake_body[0]:
             self.field[self.snake_body[-1][self.Y_KEY]][self.snake_body[-1][self.X_KEY]] = self.FIELD_CELL
@@ -158,7 +157,10 @@ class SnakeGame:
 
             self.move_snake_in_direction()
             self.draw_game_field()
-            self.record_the_arrow_keys_pressing()
+            if not self.snake_direction:
+                self.snake_direction = self.previous_snake_direction
+            else:
+                self.record_the_arrow_keys_pressing()
 
         print(self.END_PHRASE)
 
