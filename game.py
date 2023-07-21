@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 
 from pynput import keyboard
@@ -13,8 +14,9 @@ class SnakeDirection:
 
 
 class SnakeGame:
-    GREETING_PHRASE = '==Ordinary Snake Game==\nThe score: {}.'
-    END_PHRASE = '\n==Good job! Thank you for playing!=='
+    GREETING_PHRASE = '==Ordinary Snake Game==\n=The maximum recorded score is: {}=\nYour score is: {}.\n'
+    NEW_MAX_SCORE_PHRASE = '\n=Congratulations! You set a new maximum score: {}!='
+    END_PHRASE = '==Good job! Thank you for playing!=='
 
     FRUIT_CELL = ' @ '
     FIELD_CELL = ' . '
@@ -38,6 +40,19 @@ class SnakeGame:
 
         self.score = 0
 
+    @property
+    def max_score(self):
+        if os.path.exists('score.txt'):
+            with open('score.txt') as file:
+                score = file.readline()
+            return score
+        else:
+            return 0
+
+    def set_max_score(self):
+        with open('score.txt', 'w') as file:
+            file.write(str(self.score))
+
     def generate_square_field(self):
         for i in range(self.field_size):
             self.field.append([self.FIELD_CELL for _ in range(self.field_size)])
@@ -48,7 +63,7 @@ class SnakeGame:
     def draw_game_field(self):
         self.add_snake_to_the_field()
 
-        print(self.GREETING_PHRASE.format(self.score))
+        print(self.GREETING_PHRASE.format(self.max_score, self.score))
         self.add_horizontal_border_to_the_field()
         for row in self.field:
             str_row = ''
@@ -162,7 +177,10 @@ class SnakeGame:
                 self.snake_direction = self.previous_snake_direction
             else:
                 self.record_the_arrow_keys_pressing()
-
+        else:
+            if self.score > int(self.max_score):
+                print(self.NEW_MAX_SCORE_PHRASE.format(self.score))
+                self.set_max_score()
         print(self.END_PHRASE)
 
 
