@@ -1,5 +1,6 @@
 import os
 import time
+from typing import List, Dict
 
 from pynput import keyboard
 
@@ -40,11 +41,11 @@ class SnakeGame:
         self.score = 0
 
     @property
-    def max_score(self):
+    def max_score(self) -> int:
         if os.path.exists('score.txt'):
             with open('score.txt') as file:
                 score = file.readline()
-            return score
+            return int(score)
         else:
             return 0
 
@@ -89,11 +90,11 @@ class SnakeGame:
             self.generate_square_field()
         self.field[self.fruit[self.Y_KEY]][self.fruit[self.X_KEY]] = self.FRUIT_CELL
 
-    def get_initial_snake_body(self):
+    def get_initial_snake_body(self) -> List[Dict]:
         middle_field_idx = int(self.field_size // 2)
         return [{self.X_KEY: middle_field_idx - i, self.Y_KEY: middle_field_idx} for i in range(3)]
 
-    def check_borders(self):
+    def check_borders(self) -> bool:
         if self.snake_body[0][self.X_KEY] == 0 and self.snake_direction == SnakeDirection.LEFT:
             return False
         elif self.snake_body[0][self.X_KEY] == self.field_size - 1 and self.snake_direction == SnakeDirection.RIGHT:
