@@ -3,6 +3,8 @@
 # - operations for the snake to perform
 # - snake state
 # - visual representation of the field and the snake
+import os
+
 from pynput import keyboard
 
 
@@ -15,9 +17,13 @@ class SnakeDirection:
 
 
 class SnakeGame:
+    GREETING_PHRASE = 'Ordinary Snake Game!\nThe score: {}.'
+    END_PHRASE = 'Thank you for playing!'
+
     FRUIT_CELL = ' @ '
     FIELD_CELL = ' . '
-    SNAKE_BODY_PART = ' % '
+    SNAKE_HEAD = ' % '
+    SNAKE_BODY_PART = ' o '
 
     BORDER_CELL = ' ~ '
 
@@ -30,6 +36,7 @@ class SnakeGame:
 
         self.snake_body = self.get_initial_snake_body()
         self.snake_direction = SnakeDirection.RIGHT
+        self.previous_snake_direction = None
 
         self.fruit = None
 
@@ -39,17 +46,20 @@ class SnakeGame:
         for i in range(self.field_size):
             self.field.append([self.FIELD_CELL for _ in range(self.field_size)])
 
+    def add_horizontal_border_to_the_field(self):
+        print(self.BORDER_CELL * (self.field_size + 3))
+
     def draw_game_field(self):
         self.add_snake_to_the_field()
 
-        print(f'Ordinary Snake Game!\nThe score: {self.score}.')
-        print(self.BORDER_CELL * (self.field_size + 3))
+        print(self.GREETING_PHRASE.format(self.score))
+        self.add_horizontal_border_to_the_field()
         for row in self.field:
             str_row = ''
             for cell in row:
                 str_row += cell
             print(self.BORDER_CELL, str_row, self.BORDER_CELL)
-        print(self.BORDER_CELL * (self.field_size + 3))
+        self.add_horizontal_border_to_the_field()
 
     def generate_fruit_pos(self):
         import random
@@ -76,14 +86,22 @@ class SnakeGame:
     def move_snake_in_direction(self):
         prev_coord_x, prev_coord_y = self.snake_body[0][self.X_KEY], self.snake_body[0][self.Y_KEY]
 
+        new_head = None
         if self.snake_direction == SnakeDirection.UP:
-            self.snake_body.insert(0, {self.X_KEY: prev_coord_x, self.Y_KEY: prev_coord_y - 1})
+            new_head = {self.X_KEY: prev_coord_x, self.Y_KEY: prev_coord_y - 1}
         elif self.snake_direction == SnakeDirection.DOWN:
-            self.snake_body.insert(0, {self.X_KEY: prev_coord_x, self.Y_KEY: prev_coord_y + 1})
+            new_head = {self.X_KEY: prev_coord_x, self.Y_KEY: prev_coord_y + 1}
         elif self.snake_direction == SnakeDirection.LEFT:
-            self.snake_body.insert(0, {self.X_KEY: prev_coord_x - 1, self.Y_KEY: prev_coord_y})
+            new_head = {self.X_KEY: prev_coord_x - 1, self.Y_KEY: prev_coord_y}
         elif self.snake_direction == SnakeDirection.RIGHT:
-            self.snake_body.insert(0, {self.X_KEY: prev_coord_x + 1, self.Y_KEY: prev_coord_y})
+            new_head = {self.X_KEY: prev_coord_x + 1, self.Y_KEY: prev_coord_y}
+
+        if new_head:
+            if new_head != self.snake_body[1]:
+                self.snake_body.insert(0, new_head)
+            else:
+                self.snake_direction = self.previous_snake_direction
+                return
 
         if self.fruit != self.snake_body[0]:
             self.field[self.snake_body[-1][self.Y_KEY]][self.snake_body[-1][self.X_KEY]] = self.FIELD_CELL
@@ -94,8 +112,11 @@ class SnakeGame:
             self.add_fruit_to_the_field()
 
     def add_snake_to_the_field(self):
-        for part in self.snake_body:
-            self.field[part[self.Y_KEY]][part[self.X_KEY]] = self.SNAKE_BODY_PART
+        for i, part in enumerate(self.snake_body):
+            body_char = self.SNAKE_BODY_PART
+            if i == 0:
+                body_char = self.SNAKE_HEAD
+            self.field[part[self.Y_KEY]][part[self.X_KEY]] = body_char
 
     def record_the_arrow_keys_pressing(self):
         with keyboard.Events() as events:
@@ -103,6 +124,7 @@ class SnakeGame:
             event = events.get(1.0)
             if event is not None:
                 if event.key in SnakeDirection.ALL_DIRECTIONS:
+                    self.previous_snake_direction = self.snake_direction
                     self.snake_direction = event.key
 
     def check_borders(self):
@@ -123,11 +145,13 @@ class SnakeGame:
         self.add_fruit_to_the_field()
 
         while self.check_borders():
+            os.system('clear')
+
             self.move_snake_in_direction()
             self.draw_game_field()
             self.record_the_arrow_keys_pressing()
 
-        print(f'Thank you for playing!\nYour score: {self.score}.')
+        print(self.END_PHRASE)
 
 
 if __name__ == '__main__':
