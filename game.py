@@ -1,4 +1,5 @@
 import os
+import time
 
 from pynput import keyboard
 
@@ -127,10 +128,23 @@ class SnakeGame:
                 body_char = self.SNAKE_HEAD
             self.field[part[self.Y_KEY]][part[self.X_KEY]] = body_char
 
-    def record_the_arrow_keys_pressing(self):
+    @staticmethod
+    def add_pause_to_movements(func):
+        def wrapper(self):
+            max_pause, min_pause, coefficient = 1.0, 0.4, 25
+            pause = max_pause - (self.score / coefficient) if self.score / coefficient < min_pause else min_pause
+
+            start = time.time()
+            func(self, pause)
+            gap = time.time() - start
+            time.sleep(pause - gap if pause > gap > 0 else 0)
+
+        return wrapper
+
+    @add_pause_to_movements
+    def record_the_arrow_keys_pressing(self, period_in_sec):
         with keyboard.Events() as events:
-            # Block at most one second
-            event = events.get(1.0)
+            event = events.get(period_in_sec)
             if event is not None:
                 if event.key in SnakeDirection.ALL_DIRECTIONS:
                     self.previous_snake_direction = self.snake_direction
