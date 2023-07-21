@@ -47,7 +47,7 @@ class SnakeGame:
             self.field.append([self.FIELD_CELL for _ in range(self.field_size)])
 
     def add_horizontal_border_to_the_field(self):
-        print(self.BORDER_CELL * (self.field_size + 3))
+        print(self.BORDER_CELL * (self.field_size + 2))
 
     def draw_game_field(self):
         self.add_snake_to_the_field()
@@ -58,7 +58,7 @@ class SnakeGame:
             str_row = ''
             for cell in row:
                 str_row += cell
-            print(self.BORDER_CELL, str_row, self.BORDER_CELL)
+            print(self.BORDER_CELL + str_row + self.BORDER_CELL)
         self.add_horizontal_border_to_the_field()
 
     def generate_fruit_pos(self):
