@@ -49,9 +49,10 @@ class SnakeGame:
         else:
             return 0
 
-    def set_max_score(self):
+    @max_score.setter
+    def max_score(self, value):
         with open('score.txt', 'w') as file:
-            file.write(str(self.score))
+            file.write(str(value))
 
     def generate_square_field(self):
         for i in range(self.field_size):
@@ -180,7 +181,7 @@ class SnakeGame:
         else:
             if self.score > int(self.max_score):
                 print(self.NEW_MAX_SCORE_PHRASE.format(self.score))
-                self.set_max_score()
+                self.max_score = self.score
         print(self.END_PHRASE)
 
 
