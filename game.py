@@ -71,7 +71,6 @@ class SnakeGame:
     SCORE_FILE = 'score.txt'
 
     def __init__(self, field_size=10):
-        self.field_size = field_size
         self.interface = SnakeGameInterface(field_size)
 
         self.snake_body = self._get_initial_snake_body()
@@ -83,6 +82,7 @@ class SnakeGame:
         self.score = 0
 
     def launch_game(self):
+        self._generate_fruit()
         self.interface.add_fruit_to_the_field(self.fruit)
 
         while self._check_borders():
@@ -101,12 +101,13 @@ class SnakeGame:
         print(self.interface.END_PHRASE)
 
     def _check_borders(self) -> bool:
+        max_coordinate = self.interface.field_size - 1
         in_field_borders = True
         if self.snake_body[0][self.X_KEY] == 0 and self.snake_direction == SnakeDirection.LEFT:
             in_field_borders = False
-        elif self.snake_body[0][self.X_KEY] == self.field_size - 1 and self.snake_direction == SnakeDirection.RIGHT:
+        elif self.snake_body[0][self.X_KEY] == max_coordinate and self.snake_direction == SnakeDirection.RIGHT:
             in_field_borders = False
-        elif self.snake_body[0][self.Y_KEY] == self.field_size - 1 and self.snake_direction == SnakeDirection.DOWN:
+        elif self.snake_body[0][self.Y_KEY] == max_coordinate and self.snake_direction == SnakeDirection.DOWN:
             in_field_borders = False
         elif self.snake_body[0][self.Y_KEY] == 0 and self.snake_direction == SnakeDirection.UP:
             in_field_borders = False
@@ -167,7 +168,7 @@ class SnakeGame:
 
     def _generate_fruit(self):
         import random
-        sample = [i for i in range(self.field_size)]
+        sample = [i for i in range(self.interface.field_size)]
 
         self.fruit = {
             self.X_KEY: random.choice(sample),
@@ -177,7 +178,7 @@ class SnakeGame:
             self._generate_fruit()
 
     def _get_initial_snake_body(self) -> List[Dict]:
-        middle_field_idx = int(self.field_size // 2)
+        middle_field_idx = int(self.interface.field_size // 2)
         return [{self.X_KEY: middle_field_idx - i, self.Y_KEY: middle_field_idx} for i in range(3)]
 
     @property
