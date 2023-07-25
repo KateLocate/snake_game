@@ -96,18 +96,18 @@ class SnakeGame:
         return [{self.X_KEY: middle_field_idx - i, self.Y_KEY: middle_field_idx} for i in range(3)]
 
     def check_borders(self) -> bool:
+        in_field_borders = True
         if self.snake_body[0][self.X_KEY] == 0 and self.snake_direction == SnakeDirection.LEFT:
-            return False
+            in_field_borders = False
         elif self.snake_body[0][self.X_KEY] == self.field_size - 1 and self.snake_direction == SnakeDirection.RIGHT:
-            return False
+            in_field_borders = False
         elif self.snake_body[0][self.Y_KEY] == self.field_size - 1 and self.snake_direction == SnakeDirection.DOWN:
-            return False
+            in_field_borders = False
         elif self.snake_body[0][self.Y_KEY] == 0 and self.snake_direction == SnakeDirection.UP:
-            return False
+            in_field_borders = False
         elif self.snake_body[0] in self.snake_body[1:]:
-            return False
-        else:
-            return True
+            in_field_borders = False
+        return in_field_borders
 
     def move_snake_in_direction(self):
         prev_coord_x, prev_coord_y = self.snake_body[0][self.X_KEY], self.snake_body[0][self.Y_KEY]
