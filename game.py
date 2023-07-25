@@ -28,6 +28,8 @@ class SnakeGame:
     X_KEY = 'coordinate_x'
     Y_KEY = 'coordinate_y'
 
+    SCORE_FILE = 'score.txt'
+
     def __init__(self, field_size=10):
         self.field_size = field_size
         self.field = []
@@ -153,8 +155,8 @@ class SnakeGame:
         sample = [i for i in range(self.field_size)]
 
         self.fruit = {
-            'coordinate_x': random.choice(sample),
-            'coordinate_y': random.choice(sample)
+            self.X_KEY: random.choice(sample),
+            self.Y_KEY: random.choice(sample)
         }
         if self.fruit in self.snake_body:
             self._generate_fruit_pos()
@@ -172,8 +174,8 @@ class SnakeGame:
 
     @property
     def _max_score(self) -> int:
-        if os.path.exists('score.txt'):
-            with open('score.txt') as file:
+        if os.path.exists(self.SCORE_FILE):
+            with open(self.SCORE_FILE) as file:
                 score = file.readline()
             return int(score)
         else:
@@ -181,7 +183,7 @@ class SnakeGame:
 
     @_max_score.setter
     def _max_score(self, value):
-        with open('score.txt', 'w') as file:
+        with open(self.SCORE_FILE, 'w') as file:
             file.write(str(value))
 
 
