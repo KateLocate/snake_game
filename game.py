@@ -40,49 +40,23 @@ class SnakeGame:
 
         self.score = 0
 
-    @property
-    def _max_score(self) -> int:
-        if os.path.exists('score.txt'):
-            with open('score.txt') as file:
-                score = file.readline()
-            return int(score)
+    def launch_game(self):
+        self._add_fruit_to_the_field()
+
+        while self._check_borders():
+            os.system('clear')
+
+            self._move_snake_in_direction()
+            self._draw_game_field()
+            if not self.snake_direction:
+                self.snake_direction = self.previous_snake_direction
+            else:
+                self._record_the_arrow_keys_pressing()
         else:
-            return 0
-
-    @_max_score.setter
-    def _max_score(self, value):
-        with open('score.txt', 'w') as file:
-            file.write(str(value))
-
-    def _generate_square_field(self):
-        for i in range(self.field_size):
-            self.field.append([self.FIELD_CELL for _ in range(self.field_size)])
-
-    def _add_horizontal_border_to_the_field(self):
-        print(self.BORDER_CELL * (self.field_size + 2))
-
-    def _draw_game_field(self):
-        self._add_snake_to_the_field()
-
-        print(self.GREETING_PHRASE.format(self._max_score, self.score))
-        self._add_horizontal_border_to_the_field()
-        for row in self.field:
-            str_row = ''
-            for cell in row:
-                str_row += cell
-            print(self.BORDER_CELL + str_row + self.BORDER_CELL)
-        self._add_horizontal_border_to_the_field()
-
-    def _generate_fruit_pos(self):
-        import random
-        sample = [i for i in range(self.field_size)]
-
-        self.fruit = {
-            'coordinate_x': random.choice(sample),
-            'coordinate_y': random.choice(sample)
-        }
-        if self.fruit in self.snake_body:
-            self._generate_fruit_pos()
+            if self.score > int(self._max_score):
+                print(self.NEW_MAX_SCORE_PHRASE.format(self.score))
+                self._max_score = self.score
+        print(self.END_PHRASE)
 
     def _add_fruit_to_the_field(self):
         if not self.fruit:
@@ -90,10 +64,6 @@ class SnakeGame:
         if not self.field:
             self._generate_square_field()
         self.field[self.fruit[self.Y_KEY]][self.fruit[self.X_KEY]] = self.FRUIT_CELL
-
-    def _get_initial_snake_body(self) -> List[Dict]:
-        middle_field_idx = int(self.field_size // 2)
-        return [{self.X_KEY: middle_field_idx - i, self.Y_KEY: middle_field_idx} for i in range(3)]
 
     def _check_borders(self) -> bool:
         in_field_borders = True
@@ -136,12 +106,24 @@ class SnakeGame:
             self.score += 1
             self._add_fruit_to_the_field()
 
-    def _add_snake_to_the_field(self):
-        for i, part in enumerate(self.snake_body):
-            body_char = self.SNAKE_BODY_PART
-            if i == 0:
-                body_char = self.SNAKE_HEAD
-            self.field[part[self.Y_KEY]][part[self.X_KEY]] = body_char
+    def _draw_game_field(self):
+        self._add_snake_to_the_field()
+
+        print(self.GREETING_PHRASE.format(self._max_score, self.score))
+        self._add_horizontal_border_to_the_field()
+        for row in self.field:
+            str_row = ''
+            for cell in row:
+                str_row += cell
+            print(self.BORDER_CELL + str_row + self.BORDER_CELL)
+        self._add_horizontal_border_to_the_field()
+
+    def _generate_square_field(self):
+        for i in range(self.field_size):
+            self.field.append([self.FIELD_CELL for _ in range(self.field_size)])
+
+    def _add_horizontal_border_to_the_field(self):
+        print(self.BORDER_CELL * (self.field_size + 2))
 
     @staticmethod
     def _add_pause_to_movements(func):
@@ -166,23 +148,41 @@ class SnakeGame:
                     self.previous_snake_direction = self.snake_direction
                     self.snake_direction = event.key
 
-    def launch_game(self):
-        self._add_fruit_to_the_field()
+    def _generate_fruit_pos(self):
+        import random
+        sample = [i for i in range(self.field_size)]
 
-        while self._check_borders():
-            os.system('clear')
+        self.fruit = {
+            'coordinate_x': random.choice(sample),
+            'coordinate_y': random.choice(sample)
+        }
+        if self.fruit in self.snake_body:
+            self._generate_fruit_pos()
 
-            self._move_snake_in_direction()
-            self._draw_game_field()
-            if not self.snake_direction:
-                self.snake_direction = self.previous_snake_direction
-            else:
-                self._record_the_arrow_keys_pressing()
+    def _get_initial_snake_body(self) -> List[Dict]:
+        middle_field_idx = int(self.field_size // 2)
+        return [{self.X_KEY: middle_field_idx - i, self.Y_KEY: middle_field_idx} for i in range(3)]
+
+    def _add_snake_to_the_field(self):
+        for i, part in enumerate(self.snake_body):
+            body_char = self.SNAKE_BODY_PART
+            if i == 0:
+                body_char = self.SNAKE_HEAD
+            self.field[part[self.Y_KEY]][part[self.X_KEY]] = body_char
+
+    @property
+    def _max_score(self) -> int:
+        if os.path.exists('score.txt'):
+            with open('score.txt') as file:
+                score = file.readline()
+            return int(score)
         else:
-            if self.score > int(self._max_score):
-                print(self.NEW_MAX_SCORE_PHRASE.format(self.score))
-                self._max_score = self.score
-        print(self.END_PHRASE)
+            return 0
+
+    @_max_score.setter
+    def _max_score(self, value):
+        with open('score.txt', 'w') as file:
+            file.write(str(value))
 
 
 if __name__ == '__main__':
