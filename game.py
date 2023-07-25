@@ -130,7 +130,7 @@ class SnakeGame:
 
         if self.fruit != self.snake_body[0]:
             self.field[self.snake_body[-1][self.Y_KEY]][self.snake_body[-1][self.X_KEY]] = self.FIELD_CELL
-            self.snake_body = self.snake_body[:-1]
+            self.snake_body.pop(-1)
         else:
             self.fruit = None
             self.score += 1
